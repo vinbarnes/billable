@@ -11,8 +11,10 @@ end
 
 def total_for_this_month(today)
   first_of_the_month = Date.new(today.year, today.month)
-  end_of_the_month   = Date.new(today.year, today.month+1)
-  %x[punch total php --after #{first_of_the_month} --before #{end_of_the_month}].gsub("\"",'').strip.split(':')[0].to_f
+  next_month         = Date.new(today.year, today.month+1)
+  monthly = %x[punch total php --after #{first_of_the_month} --before #{next_month}].gsub("\"",'').strip.split(':')
+  monthly.unshift("0") if monthly.size < 3
+  ("%0.2f" % [monthly[0].to_i + (monthly[1].to_i / 60.0)]).to_f
 end
 
 def tell_me_like_it_is(current_monthly_total)
