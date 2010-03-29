@@ -1,4 +1,26 @@
 require 'sinatra'
+require 'yaml'
+
+class RangedHash < Hash
+  def [](key)
+    each_pair do |range, value|
+      return value if range.include?(key)
+    end
+    nil
+  end
+end
+
+def messages
+  unless @messages
+    @messages = RangedHash.new({})
+    YAML::load(File.open('messages.yaml', 'r')).each do |item|
+      @messages[Range.new(item[:begin], item[:end], item[:excl])] = item[:message]
+    end
+  end
+  @messages
+end
+
+puts messages.inspect
 
 GOAL_FOR_THE_MONTH = 40.0
 GOAL_FOR_EACH_DAY  = 4.0
@@ -18,26 +40,7 @@ def total_for_this_month(today)
 end
 
 def tell_me_like_it_is(current_monthly_total)
-  case current_monthly_total / GOAL_FOR_THE_MONTH
-  when 0..0.05
-    "Pussy"
-  when 0.05..0.15
-    "Dude, you're fucking pathetic!"
-  when 0.15..0.25
-    "Seriously... Seriously? Seriously."
-  when 0.25..0.50
-    "You are a moist toilette"
-  when 0.50..0.65
-    "You're getting warm."
-  when 0.65..0.80
-    "You can do it!"
-  when 0.80..0.99
-    "Atta Boy!"
-  when 0.99..1.10
-    "That's a bingo!"
-  when 1.10..5.00
-    "Damn, motherfucker. \nYou making bank!"
-  end
+  messages[current_monthly_total / GOAL_FOR_THE_MONTH]
 end
 
 get '/' do
