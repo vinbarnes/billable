@@ -20,8 +20,6 @@ def messages
   @messages
 end
 
-puts messages.inspect
-
 GOAL_FOR_THE_MONTH = 40.0
 GOAL_FOR_EACH_DAY  = 4.0
 
